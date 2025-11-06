@@ -1,17 +1,56 @@
 import Spline from '@splinetool/react-spline';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Github, Linkedin, Mail } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function Hero() {
+  // Mouse reactive values for cursor glow and parallax
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const smoothX = useSpring(mx, { stiffness: 120, damping: 20, mass: 0.3 });
+  const smoothY = useSpring(my, { stiffness: 120, damping: 20, mass: 0.3 });
+
+  // Map to subtle parallax ranges
+  const layerX = useTransform(smoothX, [0, 1], [-10, 10]);
+  const layerY = useTransform(smoothY, [0, 1], [-10, 10]);
+  const deeperX = useTransform(smoothX, [0, 1], [-16, 16]);
+  const deeperY = useTransform(smoothY, [0, 1], [-16, 16]);
+
+  useEffect(() => {
+    const onMove = (e) => {
+      const { innerWidth: w, innerHeight: h } = window;
+      const nx = e.clientX / w; // 0..1
+      const ny = e.clientY / h; // 0..1
+      mx.set(nx);
+      my.set(ny);
+      // Also update CSS vars for spotlight
+      const root = document.documentElement;
+      root.style.setProperty('--cursor-x', `${e.clientX}px`);
+      root.style.setProperty('--cursor-y', `${e.clientY}px`);
+    };
+    window.addEventListener('mousemove', onMove);
+    return () => window.removeEventListener('mousemove', onMove);
+  }, [mx, my]);
+
   return (
     <section id="home" className="relative w-full min-h-[90vh] overflow-hidden">
       {/* 3D Interactive Background */}
       <div className="absolute inset-0">
-        <Spline scene="https://prod.spline.design/zhZFnwyOYLgqlLWk/scene.splinecode" style={{ width: '100%', height: '100%' }} />
+        <Spline scene="https://prod.spline.design/GAomjSvthYZG1LLN/scene.splinecode" style={{ width: '100%', height: '100%' }} />
       </div>
 
       {/* Soft gradient veil to improve text contrast (does not block interaction) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/30 to-white/80 dark:from-neutral-900/60 dark:via-neutral-900/20 dark:to-neutral-900/80 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-white/10 to-white/60 dark:from-neutral-950/10 dark:via-neutral-950/20 dark:to-neutral-950/70 pointer-events-none" />
+
+      {/* Cursor-follow spotlight effect (does not block interaction) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: `radial-gradient(160px 160px at var(--cursor-x) var(--cursor-y), rgba(99,102,241,0.18), transparent 35%), radial-gradient(320px 220px at calc(var(--cursor-x) + 60px) calc(var(--cursor-y) + 40px), rgba(6,182,212,0.12), transparent 40%)`,
+          mixBlendMode: 'screen',
+        }}
+      />
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20 grid md:grid-cols-2 gap-10 items-center">
         {/* Intro copy */}
@@ -22,9 +61,12 @@ export default function Hero() {
           viewport={{ once: true }}
           className="space-y-6"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold">
+          <motion.span
+            style={{ x: layerX, y: layerY }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold shadow-sm"
+          >
             Interactive • Modern • Playful
-          </span>
+          </motion.span>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
             Hi, I’m <span className="text-indigo-600">Viral Jain</span>
           </h1>
@@ -51,7 +93,7 @@ export default function Hero() {
           </div>
         </motion.div>
 
-        {/* Interactive social dock (replaces the old tip box) */}
+        {/* Interactive social dock with parallax */}
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -59,8 +101,16 @@ export default function Hero() {
           viewport={{ once: true }}
           className="relative"
         >
-          <div className="absolute -top-10 -right-10 w-56 h-56 bg-indigo-400/30 blur-3xl rounded-full pointer-events-none" />
-          <div className="absolute -bottom-10 -left-10 w-56 h-56 bg-cyan-400/30 blur-3xl rounded-full pointer-events-none" />
+          <motion.div
+            aria-hidden
+            className="absolute -top-10 -right-10 w-56 h-56 bg-indigo-400/30 blur-3xl rounded-full pointer-events-none"
+            style={{ x: deeperX, y: deeperY }}
+          />
+          <motion.div
+            aria-hidden
+            className="absolute -bottom-10 -left-10 w-56 h-56 bg-cyan-400/30 blur-3xl rounded-full pointer-events-none"
+            style={{ x: layerX, y: layerY }}
+          />
 
           <div className="relative rounded-2xl border border-white/40 shadow-xl backdrop-blur bg-white/40 dark:bg-neutral-900/40 p-6">
             <div className="grid gap-4">
