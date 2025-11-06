@@ -21,7 +21,7 @@ export default function Navbar() {
   return (
     <header className={`fixed top-0 left-0 w-full z-50 transition-colors ${scrolled ? 'backdrop-blur bg-white/60 dark:bg-neutral-900/60 border-b border-black/5 dark:border-white/5' : 'bg-transparent'}`}>
       <nav className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        <a href="#home" className="font-semibold tracking-tight text-xl">Student<span className="text-indigo-600">.dev</span></a>
+        <a href="#home" className="font-semibold tracking-tight text-xl">Viral<span className="text-indigo-600">Jain</span></a>
 
         <div className="hidden md:flex items-center gap-8">
           {links.map((l) => (

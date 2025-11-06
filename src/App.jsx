@@ -17,7 +17,7 @@ function App() {
       </main>
 
       <footer className="py-10 text-center text-sm text-neutral-600 dark:text-neutral-400">
-        © {new Date().getFullYear()} Student.dev — Built with love, code, and a little 3D.
+        © {new Date().getFullYear()} Viral Jain — Built with love, code, and a little 3D.
       </footer>
     </div>
   );
